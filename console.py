@@ -10,6 +10,7 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
+import shlex
 
 
 class HBNBCommand(cmd.Cmd):
@@ -113,26 +114,40 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
+    def kvalue_parse(self, args):
+        """creates a dict from strings"""
+        ndict = {}
+        for arg in args:
+            if "=" in arg:
+                k = arg.split('=', 1)
+                key = k[0]
+                value = k[1]
+                if value[0] == value[-1] == '"':
+                    value = shlex.split(value)[0].replace('_', ' ')
+                else:
+                    try:
+                        value = int(value)
+                    except:
+                        try:
+                            value = float(value)
+                        except:
+                            continue
+                ndict[key] = value
+        return ndict
+
+    def do_create(self, a):
         """ Create an object of any class"""
-        try:
-            if not args:
-                raise SyntaxError()
-            alist = args.split(" ")
-            x = eval("{}()".format(alist[0]))
-            for r in alist[1:]:
-                k_value = r.split('=')
-                k = k_value[0]
-                value = k_value[1]
-                t = {34: None, 95: 32}
-                value = value.translate(t)
-                setattr(args, k, value)
-            x.save()
-            print("{}".format(x.id))
-        except SyntaxError:
+        args = a.split()
+        if len(args) == 0:
             print("** class name missing **")
-        except NameError:
+            return
+        elif args[0] not in HBNBCommand.classes:
             print("** class doesn't exist **")
+            return
+        dic = self.kvalue_parse(args[1:])
+        new_instance = HBNBCommand.classes[args[0]](*dic)
+        print(new_instance.id)
+        storage.save()
 
     def help_create(self):
         """ Help information for the create method """
