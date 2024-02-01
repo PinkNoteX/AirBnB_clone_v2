@@ -2,7 +2,7 @@
 # generate a .tgz archive from web_static
 from fabric.api import *
 import os
-from datatime import datatime
+from datetime import datetime
 import tarfile
 
 
