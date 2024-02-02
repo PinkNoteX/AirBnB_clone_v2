@@ -17,6 +17,8 @@ def do_pack():
         p = "web_static_" + datetime.now().strftime("%Y%m%d%H%M%S")
         local('mkdir -p versions')
         local("tar -cvzf versions/{}.tgz {}".format(p, "web_static/"))
+        s = os.path.getsize("./versions/{}.tgz".format(p))
+        print("web_static packed: versions/{}.tgz -> {}Bytes".format(p, s))
         return ("./versions/{}.tgz".format(p))
     except Exception:
         return None
@@ -28,9 +30,10 @@ def do_deploy(archive_path):
     try:
         put(archive_path, '/tmp/{}'.format(f))
         run('mkdir -p /data/web_static/releases/{}'.format(f))
+        run('rm -fr /data/web_static/releases/{}/*'.format(f))
         run('tar -xzf /tmp/{} -C /data/web_static/releases/{}'.format(f, f))
         run('rm /tmp/{}'.format(f))
-        run("rsync -a /data/web_static/releases/{}/web_static/* "
+        run("mv /data/web_static/releases/{}/web_static/* "
             "/data/web_static/releases/{}/".format(f, f))
         run('rm -rf /data/web_static/releases/{}/web_static'.format(f))
         run('rm -rf /data/web_static/current')
