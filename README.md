@@ -42,6 +42,6 @@ Run:
     
     (hbnb)
 ## Authors
-Omar Ehab omarfargahly8@gmail.com
+Omar Ehab omarfarghaly8@gmail.com
 
 
